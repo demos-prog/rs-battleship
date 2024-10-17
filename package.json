@@ -5,18 +5,18 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node ./index.js",
-    "start:dev": "nodemon ./index.js",
+    "start": "tsc && node dist/index.js",
+    "start:dev": "ts-node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Andrei Auchynnikau",
   "keywords": [],
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^2.0.16",
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.4",
     "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.12",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.42.0",
@@ -26,12 +26,13 @@
     "prettier": "^3.0.0",
     "ts-jest": "^29.2.5",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
-    "ws": "^8.8.0",
     "dotenv": "^16.4.5",
+    "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "ws": "^8.8.0"
   }
 }
