@@ -73,9 +73,6 @@ function handleMessage(ws: WebSocket, data: DataType) {
     case 'add_user_to_room':
       addUserToRoom(data.data as { indexRoom: number | string });
       break;
-    // case 'create_game':
-    //   handleCreateGame(ws, data);
-    //   break;
     // case 'start_game':
     //   handleStartGame(ws, data);
     //   break;
@@ -176,17 +173,25 @@ function addUserToRoom(data: { indexRoom: number | string }) {
 
   rooms.set(index, room);
   updateRoom();
+  createGame(index);
 }
 
-// function handleCreateGame(ws: WebSocket, data: DataType) {
-//   const gameId = uuidv4();
-//   const playerId = data.playerId;
-//   const game = { id: gameId, players: [playerId], state: 'waiting' };
-//   games.set(gameId, game);
-//   rooms.set(gameId, { id: gameId, players: [players.get(playerId).name] });
-//   sendPersonalResponse(ws, 'create_game', { gameId, playerId });
-//   broadcastRoomUpdate();
-// }
+//sends for both players in the room, after they are connected to the room
+function createGame(idGame: number | string) {
+  const res = JSON.stringify({
+    type: 'create_game',
+    data: JSON.stringify({
+      idGame,
+      idPlayer: uuidv4(),
+    }),
+    id: 0,
+  });
+
+  const room: RoomType = rooms.get(idGame);
+  room.roomUsers.forEach((user) => {
+    players.get(user.index).ws.send(res);
+  });
+}
 
 // function handleStartGame(ws: WebSocket, data: DataType) {
 //   const game = games.get(data.gameId);
