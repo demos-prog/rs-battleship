@@ -8,6 +8,7 @@ import { CreatedUser } from './src/dto/CreatedUser.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as http from 'http';
+import { RoomType } from './src/Room.type';
 
 const httpServer = http.createServer(function (req, res) {
   const __dirname = path.resolve(path.dirname(''));
@@ -31,6 +32,13 @@ const wss = new WebSocketServer({ server: httpServer });
 const games = new Map();
 const players = new Map();
 const rooms = new Map();
+
+let currentUser: CreatedUser = {
+  name: '',
+  index: '',
+  error: false,
+  errorText: '',
+};
 
 wss.on('connection', (ws: WebSocket) => {
   console.log('New connection');
@@ -56,6 +64,9 @@ function handleMessage(ws: WebSocket, data: DataType) {
     case 'reg':
       handleRegistration(ws, data.data as NewUser);
       break;
+    case 'create_room':
+      createRoom(ws, currentUser);
+      break;
     // case 'create_game':
     //   handleCreateGame(ws, data);
     //   break;
@@ -65,9 +76,9 @@ function handleMessage(ws: WebSocket, data: DataType) {
     // case 'attack':
     //   handleAttack(ws, data);
     //   break;
-    // case 'update_room':
-    //   updateRoom(ws);
-    //   break;
+    case 'update_room':
+      updateRoom(ws);
+      break;
 
     default:
       sendError(ws, 'Unknown message type');
@@ -97,7 +108,26 @@ function handleRegistration(ws: WebSocket, data: NewUser) {
     error: false,
     errorText: 'No errors',
   };
+
+  currentUser = createdUser;
   sendPersonalResponse(ws, 'reg', createdUser);
+  updateRoom(ws);
+}
+
+// creates game room and add yourself there
+function createRoom(ws: WebSocket, user: CreatedUser) {
+  const newRoom: RoomType = {
+    roomId: uuidv4(),
+    roomUsers: [
+      {
+        name: user.name,
+        index: user.index,
+      },
+    ],
+  };
+
+  rooms.set(newRoom.roomId, newRoom);
+  updateRoom(ws);
 }
 
 // function handleCreateGame(ws: WebSocket, data: DataType) {
@@ -164,10 +194,18 @@ function sendPersonalResponse(ws: WebSocket, type: string, data: CreatedUser) {
 //   ws.send(JSON.stringify({ type: 'game', responseType: type, ...data }));
 // }
 
-// function updateRoom(ws: WebSocket) {
-//   const roomData = Array.from(rooms.values());
-//   ws.send(JSON.stringify({ type: 'update_room', rooms: roomData }));
-// }
+// sends rooms list, where only one player inside
+function updateRoom(ws: WebSocket) {
+  const roomData = Array.from(rooms.values());
+  const response = JSON.stringify({
+    type: 'update_room',
+    data: JSON.stringify(roomData),
+    id: 0,
+  });
+  console.log(response);
+
+  ws.send(response);
+}
 
 // function sendWinnersUpdate(ws: WebSocket) {
 //   // Implement logic to get and send the score table

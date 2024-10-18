@@ -1,4 +1,4 @@
 export type NewUser = {
-  name: String;
-  password: String;
+  name: string;
+  password: string;
 };

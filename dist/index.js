@@ -61,10 +61,10 @@ function handleMessage(ws, data) {
     }
 }
 function handleRegistration(ws, data) {
-    let userData;
+    let usersData;
     if (typeof data === 'string') {
         try {
-            userData = JSON.parse(data);
+            usersData = JSON.parse(data);
         }
         catch (error) {
             console.error('Error parsing NewUser data:', error);
@@ -73,12 +73,12 @@ function handleRegistration(ws, data) {
         }
     }
     else {
-        userData = data;
+        usersData = data;
     }
     const playerId = uuidv4();
-    players.set(playerId, { ws, name: userData.name });
+    players.set(playerId, { ws, name: usersData.name });
     const createdUser = {
-        name: userData.name,
+        name: usersData.name,
         index: playerId,
         error: false,
         errorText: 'No errors',
@@ -139,8 +139,6 @@ function sendPersonalResponse(ws, type, data) {
         data: JSON.stringify(data),
         id: 0,
     });
-    console.log('sendPersonalResponse');
-    console.log(response);
     ws.send(response);
 }
 // function sendGameResponse(ws: WebSocket, type, data) {
