@@ -28,7 +28,6 @@ const HTTP_PORT = 3000;
 
 const wss = new WebSocketServer({ server: httpServer });
 
-const games = new Map();
 const players = new Map();
 const rooms = new Map();
 const scoreTable: ScoreTableItem[] = [];
