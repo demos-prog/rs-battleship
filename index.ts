@@ -1,14 +1,15 @@
 import { WebSocketServer, WebSocket } from 'ws';
 // import { httpServer } from './src/http_server/index.js';
 import { v4 as uuidv4 } from 'uuid';
-import { DataType } from './src/data.type';
+import { DataType } from './src/instancies/Data.type';
 import { NewUser } from './src/dto/NewUser.dto';
 import { CreatedUser } from './src/dto/CreatedUser.dto';
 
 import * as fs from 'fs';
 import * as path from 'path';
 import * as http from 'http';
-import { RoomType } from './src/Room.type';
+import { RoomType } from './src/instancies/Room.type';
+import { ScoreTableItem } from './src/instancies/ScoreTableItem.type';
 
 const httpServer = http.createServer(function (req, res) {
   const __dirname = path.resolve(path.dirname(''));
@@ -32,6 +33,7 @@ const wss = new WebSocketServer({ server: httpServer });
 const games = new Map();
 const players = new Map();
 const rooms = new Map();
+const scoreTable: ScoreTableItem[] = [];
 
 let currentUser: CreatedUser = {
   name: '',
@@ -66,6 +68,9 @@ function handleMessage(ws: WebSocket, data: DataType) {
       break;
     case 'create_room':
       createRoom(ws, currentUser);
+      break;
+    case 'update_winners':
+      updateWinnners(ws);
       break;
     // case 'create_game':
     //   handleCreateGame(ws, data);
@@ -112,6 +117,7 @@ function handleRegistration(ws: WebSocket, data: NewUser) {
   currentUser = createdUser;
   sendPersonalResponse(ws, 'reg', createdUser);
   updateRoom(ws);
+  updateWinnners(ws);
 }
 
 // creates game room and add yourself there
@@ -128,6 +134,15 @@ function createRoom(ws: WebSocket, user: CreatedUser) {
 
   rooms.set(newRoom.roomId, newRoom);
   updateRoom(ws);
+}
+
+function updateWinnners(ws: WebSocket) {
+  const response = JSON.stringify({
+    type: 'update_winners',
+    data: JSON.stringify(scoreTable.sort((a, b) => b.wins - a.wins)),
+    id: 0,
+  });
+  ws.send(response);
 }
 
 // function handleCreateGame(ws: WebSocket, data: DataType) {
@@ -202,8 +217,6 @@ function updateRoom(ws: WebSocket) {
     data: JSON.stringify(roomData),
     id: 0,
   });
-  console.log(response);
-
   ws.send(response);
 }
 

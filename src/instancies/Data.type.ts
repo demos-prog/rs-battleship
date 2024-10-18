@@ -1,8 +1,8 @@
 export interface DataType {
   type:
     | 'reg' // done
-    | 'update_winners'
-    | 'create_room'
+    | 'update_winners' // done
+    | 'create_room' // done
     | 'add_user_to_room'
     | 'create_game'
     | 'update_room' // done
