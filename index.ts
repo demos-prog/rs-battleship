@@ -1,15 +1,13 @@
 import { WebSocketServer, WebSocket } from 'ws';
-// import { httpServer } from './src/http_server/index.js';
 import { v4 as uuidv4 } from 'uuid';
-import { DataType } from './src/instancies/Data.type';
-import { NewUser } from './src/dto/NewUser.dto';
-import { CreatedUser } from './src/dto/CreatedUser.dto';
-
 import * as fs from 'fs';
 import * as path from 'path';
 import * as http from 'http';
-import { RoomType } from './src/instancies/Room.type';
-import { ScoreTableItem } from './src/instancies/ScoreTableItem.type';
+import { RoomType } from './src/entities/Room.type';
+import { DataType } from './src/entities/Data.type';
+import { ScoreTableItem } from './src/entities/ScoreTableItem.type';
+import { NewUser } from './src/dto/NewUser.dto';
+import { CreatedUser } from './src/dto/CreatedUser.dto';
 
 const httpServer = http.createServer(function (req, res) {
   const __dirname = path.resolve(path.dirname(''));
@@ -67,10 +65,13 @@ function handleMessage(ws: WebSocket, data: DataType) {
       handleRegistration(ws, data.data as NewUser);
       break;
     case 'create_room':
-      createRoom(ws, currentUser);
+      createRoom(currentUser);
       break;
     case 'update_winners':
-      updateWinnners(ws);
+      updateWinnners();
+      break;
+    case 'add_user_to_room':
+      addUserToRoom(data.data as { indexRoom: number | string });
       break;
     // case 'create_game':
     //   handleCreateGame(ws, data);
@@ -82,7 +83,7 @@ function handleMessage(ws: WebSocket, data: DataType) {
     //   handleAttack(ws, data);
     //   break;
     case 'update_room':
-      updateRoom(ws);
+      updateRoom();
       break;
 
     default:
@@ -116,12 +117,11 @@ function handleRegistration(ws: WebSocket, data: NewUser) {
 
   currentUser = createdUser;
   sendPersonalResponse(ws, 'reg', createdUser);
-  updateRoom(ws);
-  updateWinnners(ws);
+  updateRoom();
+  updateWinnners();
 }
 
-// creates game room and add yourself there
-function createRoom(ws: WebSocket, user: CreatedUser) {
+function createRoom(user: CreatedUser) {
   const newRoom: RoomType = {
     roomId: uuidv4(),
     roomUsers: [
@@ -133,16 +133,49 @@ function createRoom(ws: WebSocket, user: CreatedUser) {
   };
 
   rooms.set(newRoom.roomId, newRoom);
-  updateRoom(ws);
+  console.log('Room created:', newRoom);
+  console.log('Total rooms:', rooms.size);
+  updateRoom();
 }
 
-function updateWinnners(ws: WebSocket) {
+function updateWinnners() {
   const response = JSON.stringify({
     type: 'update_winners',
     data: JSON.stringify(scoreTable.sort((a, b) => b.wins - a.wins)),
     id: 0,
   });
-  ws.send(response);
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(response);
+    }
+  });
+}
+
+// add youself to somebodys room, then remove the room from available rooms list
+function addUserToRoom(data: { indexRoom: number | string }) {
+  let index: string;
+  if (typeof data === 'string') {
+    index = JSON.parse(data).indexRoom;
+  } else if (typeof data.indexRoom === 'string') {
+    index = data.indexRoom;
+  } else {
+    console.error('Invalid indexRoom type');
+    return;
+  }
+
+  const room = rooms.get(index);
+  if (!room) {
+    console.error('Room not found');
+    return;
+  }
+
+  room.roomUsers.push({
+    name: currentUser.name,
+    index: currentUser.index,
+  });
+
+  rooms.set(index, room);
+  updateRoom();
 }
 
 // function handleCreateGame(ws: WebSocket, data: DataType) {
@@ -210,14 +243,20 @@ function sendPersonalResponse(ws: WebSocket, type: string, data: CreatedUser) {
 // }
 
 // sends rooms list, where only one player inside
-function updateRoom(ws: WebSocket) {
-  const roomData = Array.from(rooms.values());
+function updateRoom() {
+  const roomData = Array.from(rooms.values()).filter(
+    (room: RoomType) => room.roomUsers.length === 1,
+  );
   const response = JSON.stringify({
     type: 'update_room',
     data: JSON.stringify(roomData),
     id: 0,
   });
-  ws.send(response);
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(response);
+    }
+  });
 }
 
 // function sendWinnersUpdate(ws: WebSocket) {
@@ -247,14 +286,6 @@ function updateRoom(ws: WebSocket) {
 function sendError(ws: WebSocket, message: String) {
   ws.send(JSON.stringify({ type: 'error', message }));
 }
-
-// function generateShipPositions() {}
-// function performAttack(game, playerId, coordinates) {}
-// function isGameFinished(game) {}
-// function determineWinner(game) {}
-// function getNextPlayer(game) {}
-// function getScoreTable() {}
-// function updateWinners(winner) {}
 
 httpServer.listen(HTTP_PORT, () => {
   console.log(`Server is running on http://localhost:${HTTP_PORT}`);
