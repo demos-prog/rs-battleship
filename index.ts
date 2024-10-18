@@ -1,18 +1,18 @@
-import { WebSocketServer, WebSocket } from 'ws';
-import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as http from 'http';
-import { RoomType } from './src/entities/Room.type';
-import { DataType } from './src/entities/Data.type';
-import { ScoreTableItem } from './src/entities/ScoreTableItem.type';
-import { NewUser } from './src/dto/NewUser.dto';
-import { CreatedUser } from './src/dto/CreatedUser.dto';
+import { WebSocketServer, WebSocket } from "ws";
+import { v4 as uuidv4 } from "uuid";
+import * as fs from "fs";
+import * as path from "path";
+import * as http from "http";
+import { RoomType } from "./src/entities/Room.type";
+import { DataType } from "./src/entities/Data.type";
+import { ScoreTableItem } from "./src/entities/ScoreTableItem.type";
+import { NewUser } from "./src/dto/NewUser.dto";
+import { CreatedUser } from "./src/dto/CreatedUser.dto";
 
 const httpServer = http.createServer(function (req, res) {
-  const __dirname = path.resolve(path.dirname(''));
+  const __dirname = path.resolve(path.dirname(""));
   const file_path =
-    __dirname + (req.url === '/' ? '/front/index.html' : '/front' + req.url);
+    __dirname + (req.url === "/" ? "/front/index.html" : "/front" + req.url);
   fs.readFile(file_path, function (err, data) {
     if (err) {
       res.writeHead(404);
@@ -34,26 +34,26 @@ const rooms = new Map();
 const scoreTable: ScoreTableItem[] = [];
 
 let currentUser: CreatedUser = {
-  name: '',
-  index: '',
+  name: "",
+  index: "",
   error: false,
-  errorText: '',
+  errorText: "",
 };
 
-wss.on('connection', (ws: WebSocket) => {
-  console.log('New connection');
+wss.on("connection", (ws: WebSocket) => {
+  console.log("New connection");
 
-  ws.addEventListener('message', (event) => {
+  ws.addEventListener("message", (event) => {
     try {
       const parsedData: DataType = JSON.parse(event.data as string);
       handleMessage(ws, parsedData);
     } catch (error) {
-      console.error('Error parsing message:', error);
-      sendError(ws, 'Invalid message format');
+      console.error("Error parsing message:", error);
+      sendError(ws, "Invalid message format");
     }
   });
 
-  ws.addEventListener('close', () => {
+  ws.addEventListener("close", () => {
     // Handle player disconnection
     // Remove player from rooms, games, etc.
   });
@@ -61,16 +61,16 @@ wss.on('connection', (ws: WebSocket) => {
 
 function handleMessage(ws: WebSocket, data: DataType) {
   switch (data.type) {
-    case 'reg':
+    case "reg":
       handleRegistration(ws, data.data as NewUser);
       break;
-    case 'create_room':
+    case "create_room":
       createRoom(currentUser);
       break;
-    case 'update_winners':
+    case "update_winners":
       updateWinnners();
       break;
-    case 'add_user_to_room':
+    case "add_user_to_room":
       addUserToRoom(data.data as { indexRoom: number | string });
       break;
     // case 'start_game':
@@ -79,23 +79,23 @@ function handleMessage(ws: WebSocket, data: DataType) {
     // case 'attack':
     //   handleAttack(ws, data);
     //   break;
-    case 'update_room':
+    case "update_room":
       updateRoom();
       break;
 
     default:
-      sendError(ws, 'Unknown message type');
+      sendError(ws, "Unknown message type");
   }
 }
 
 function handleRegistration(ws: WebSocket, data: NewUser) {
   let usersData: NewUser;
-  if (typeof data === 'string') {
+  if (typeof data === "string") {
     try {
       usersData = JSON.parse(data);
     } catch (error) {
-      console.error('Error parsing NewUser data:', error);
-      sendError(ws, 'Invalid NewUser data format');
+      console.error("Error parsing NewUser data:", error);
+      sendError(ws, "Invalid NewUser data format");
       return;
     }
   } else {
@@ -109,11 +109,11 @@ function handleRegistration(ws: WebSocket, data: NewUser) {
     name: usersData.name,
     index: playerId,
     error: false,
-    errorText: 'No errors',
+    errorText: "No errors",
   };
 
   currentUser = createdUser;
-  sendPersonalResponse(ws, 'reg', createdUser);
+  sendPersonalResponse(ws, "reg", createdUser);
   updateRoom();
   updateWinnners();
 }
@@ -130,14 +130,14 @@ function createRoom(user: CreatedUser) {
   };
 
   rooms.set(newRoom.roomId, newRoom);
-  console.log('Room created:', newRoom);
-  console.log('Total rooms:', rooms.size);
+  console.log("Room created:", newRoom);
+  console.log("Total rooms:", rooms.size);
   updateRoom();
 }
 
 function updateWinnners() {
   const response = JSON.stringify({
-    type: 'update_winners',
+    type: "update_winners",
     data: JSON.stringify(scoreTable.sort((a, b) => b.wins - a.wins)),
     id: 0,
   });
@@ -151,18 +151,18 @@ function updateWinnners() {
 // add youself to somebodys room, then remove the room from available rooms list
 function addUserToRoom(data: { indexRoom: number | string }) {
   let index: string;
-  if (typeof data === 'string') {
+  if (typeof data === "string") {
     index = JSON.parse(data).indexRoom;
-  } else if (typeof data.indexRoom === 'string') {
+  } else if (typeof data.indexRoom === "string") {
     index = data.indexRoom;
   } else {
-    console.error('Invalid indexRoom type');
+    console.error("Invalid indexRoom type");
     return;
   }
 
   const room = rooms.get(index);
   if (!room) {
-    console.error('Room not found');
+    console.error("Room not found");
     return;
   }
 
@@ -179,7 +179,7 @@ function addUserToRoom(data: { indexRoom: number | string }) {
 //sends for both players in the room, after they are connected to the room
 function createGame(idGame: number | string) {
   const res = JSON.stringify({
-    type: 'create_game',
+    type: "create_game",
     data: JSON.stringify({
       idGame,
       idPlayer: uuidv4(),
@@ -250,10 +250,10 @@ function sendPersonalResponse(ws: WebSocket, type: string, data: CreatedUser) {
 // sends rooms list, where only one player inside
 function updateRoom() {
   const roomData = Array.from(rooms.values()).filter(
-    (room: RoomType) => room.roomUsers.length === 1,
+    (room: RoomType) => room.roomUsers.length === 1
   );
   const response = JSON.stringify({
-    type: 'update_room',
+    type: "update_room",
     data: JSON.stringify(roomData),
     id: 0,
   });
@@ -289,7 +289,7 @@ function updateRoom() {
 // }
 
 function sendError(ws: WebSocket, message: String) {
-  ws.send(JSON.stringify({ type: 'error', message }));
+  ws.send(JSON.stringify({ type: "error", message }));
 }
 
 httpServer.listen(HTTP_PORT, () => {
