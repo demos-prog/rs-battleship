@@ -8,6 +8,9 @@ import { DataType } from "./src/entities/Data.type";
 import { ScoreTableItem } from "./src/entities/ScoreTableItem.type";
 import { NewUser } from "./src/dto/NewUser.dto";
 import { CreatedUser } from "./src/dto/CreatedUser.dto";
+import { GameDto } from "./src/dto/Game.dto";
+import { GameType } from "./src/entities/Game.type";
+import { PlayerType } from "./src/entities/Player.type";
 
 const httpServer = http.createServer(function (req, res) {
   const __dirname = path.resolve(path.dirname(""));
@@ -28,6 +31,7 @@ const HTTP_PORT = 3000;
 
 const wss = new WebSocketServer({ server: httpServer });
 
+const games = new Map();
 const players = new Map();
 const rooms = new Map();
 const scoreTable: ScoreTableItem[] = [];
@@ -71,6 +75,9 @@ function handleMessage(ws: WebSocket, data: DataType) {
       break;
     case "add_user_to_room":
       addUserToRoom(data.data as { indexRoom: number | string });
+      break;
+    case "add_ships":
+      addShips(data.data as GameDto);
       break;
     // case 'start_game':
     //   handleStartGame(ws, data);
@@ -181,15 +188,60 @@ function createGame(idGame: number | string) {
     type: "create_game",
     data: JSON.stringify({
       idGame,
-      idPlayer: uuidv4(),
+      idPlayer: currentUser.index,
     }),
     id: 0,
   });
 
+  let newGame: GameType = {
+    gameId: idGame,
+    players: [
+      {
+        ships: [],
+        indexPlayer: "",
+      },
+      {
+        ships: [],
+        indexPlayer: "",
+      },
+    ],
+  };
+
   const room: RoomType = rooms.get(idGame);
-  room.roomUsers.forEach((user) => {
+  room.roomUsers.forEach((user, i) => {
+    newGame.players[i].indexPlayer = user.index;
     players.get(user.index).ws.send(res);
   });
+  games.set(idGame, newGame);
+}
+
+function addShips(gameData: GameDto) {
+  if (typeof gameData === "string") {
+    gameData = JSON.parse(gameData);
+  }
+  console.log(gameData.indexPlayer);
+
+  const game: GameType = games.get(gameData.gameId);
+
+  if (game) {
+    const player: PlayerType | undefined = game.players.find(
+      (player: PlayerType) => player.indexPlayer === gameData.indexPlayer
+    );
+
+    if (player) {
+      player.ships = gameData.ships;
+      game.players[game.players.indexOf(player)] = player;
+      games.set(gameData.gameId, game);
+
+      games.get(gameData.gameId).players.forEach((player: PlayerType) => {
+        console.log(player);
+      });
+    } else {
+      console.error("Player not found");
+    }
+  } else {
+    console.error("Game not found");
+  }
 }
 
 // function handleStartGame(ws: WebSocket, data: DataType) {
