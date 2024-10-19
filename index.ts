@@ -194,15 +194,6 @@ function addUserToRoom(ws: WebSocket, data: { indexRoom: number | string }) {
 
 //sends for both players in the room, after they are connected to the room
 function createGame(idGame: number | string) {
-  const res = JSON.stringify({
-    type: "create_game",
-    data: JSON.stringify({
-      idGame,
-      idPlayer: currentUser.index,
-    }),
-    id: 0,
-  });
-
   let newGame: GameType = {
     gameId: idGame,
     players: [
@@ -219,6 +210,15 @@ function createGame(idGame: number | string) {
 
   const room: RoomType = rooms.get(idGame);
   room.roomUsers.forEach((user, i) => {
+    const res = JSON.stringify({
+      type: "create_game",
+      data: JSON.stringify({
+        idGame,
+        idPlayer: user.index,
+      }),
+      id: 0,
+    });
+
     newGame.players[i].indexPlayer = user.index;
     players.get(user.index).ws.send(res);
   });
