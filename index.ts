@@ -74,7 +74,7 @@ function handleMessage(ws: WebSocket, data: DataType) {
       updateWinnners();
       break;
     case "add_user_to_room":
-      addUserToRoom(data.data as { indexRoom: number | string });
+      addUserToRoom(ws, data.data as { indexRoom: number | string });
       break;
     case "add_ships":
       addShips(data.data as GameDto);
@@ -136,8 +136,6 @@ function createRoom(user: CreatedUser) {
   };
 
   rooms.set(newRoom.roomId, newRoom);
-  console.log("Room created:", newRoom);
-  console.log("Total rooms:", rooms.size);
   updateRoom();
 }
 
@@ -155,7 +153,7 @@ function updateWinnners() {
 }
 
 // add youself to somebodys room, then remove the room from available rooms list
-function addUserToRoom(data: { indexRoom: number | string }) {
+function addUserToRoom(ws: WebSocket, data: { indexRoom: number | string }) {
   let index: string;
   if (typeof data === "string") {
     index = JSON.parse(data).indexRoom;
@@ -169,6 +167,18 @@ function addUserToRoom(data: { indexRoom: number | string }) {
   const room = rooms.get(index);
   if (!room) {
     console.error("Room not found");
+    return;
+  }
+
+  if (room.roomUsers[0].index === currentUser.index) {
+    ws.send(
+      JSON.stringify({
+        type: "error",
+        data: "You are already in this room",
+        id: 0,
+      })
+    );
+    console.log("You are already in this room");
     return;
   }
 
@@ -219,7 +229,7 @@ function addShips(gameData: GameDto) {
   if (typeof gameData === "string") {
     gameData = JSON.parse(gameData);
   }
-  console.log(gameData.indexPlayer);
+  console.log("indexPlayer from client", gameData.indexPlayer);
 
   const game: GameType = games.get(gameData.gameId);
 
@@ -244,47 +254,6 @@ function addShips(gameData: GameDto) {
   }
 }
 
-// function handleStartGame(ws: WebSocket, data: DataType) {
-//   const game = games.get(data.gameId);
-//   if (game && game.players.includes(data.playerId)) {
-//     game.state = 'playing';
-//     // Generate ship positions and other game setup logic here
-//     const shipPositions = generateShipPositions();
-//     sendGameResponse(ws, 'start_game', {
-//       gameInfo: {
-//         /* game information */
-//       },
-//       ships: shipPositions,
-//     });
-//     sendGameResponse(ws, 'turn', { playerId: game.players[0] });
-//   } else {
-//     sendError(ws, 'Invalid game or player');
-//   }
-// }
-
-// function handleAttack(ws: WebSocket, data: DataType) {
-//   const game = games.get(data.gameId);
-//   if (game && game.state === 'playing') {
-//     // Implement attack logic here
-//     const attackResult = performAttack(game, data.playerId, data.coordinates);
-//     sendGameResponse(ws, 'attack', attackResult);
-//     if (isGameFinished(game)) {
-//       const winner = determineWinner(game);
-//       sendGameResponse(ws, 'finish', { winnerId: winner });
-//       updateWinners(winner);
-//       games.delete(data.gameId);
-//       rooms.delete(data.gameId);
-//       broadcastRoomUpdate();
-//       broadcastWinnersUpdate();
-//     } else {
-//       const nextPlayer = getNextPlayer(game);
-//       sendGameResponse(ws, 'turn', { playerId: nextPlayer });
-//     }
-//   } else {
-//     sendError(ws, 'Invalid game or game state');
-//   }
-// }
-
 function sendPersonalResponse(ws: WebSocket, type: string, data: CreatedUser) {
   const response = JSON.stringify({
     type,
@@ -293,10 +262,6 @@ function sendPersonalResponse(ws: WebSocket, type: string, data: CreatedUser) {
   });
   ws.send(response);
 }
-
-// function sendGameResponse(ws: WebSocket, type, data) {
-//   ws.send(JSON.stringify({ type: 'game', responseType: type, ...data }));
-// }
 
 // sends rooms list, where only one player inside
 function updateRoom() {
@@ -314,30 +279,6 @@ function updateRoom() {
     }
   });
 }
-
-// function sendWinnersUpdate(ws: WebSocket) {
-//   // Implement logic to get and send the score table
-//   const scoreTable = getScoreTable();
-//   ws.send(JSON.stringify({ type: 'update_winners', scoreTable }));
-// }
-
-// function broadcastRoomUpdate() {
-//   const roomData = Array.from(rooms.values());
-//   wss.clients.forEach((client) => {
-//     if (client.readyState === WebSocket.OPEN) {
-//       client.send(JSON.stringify({ type: 'update_room', rooms: roomData }));
-//     }
-//   });
-// }
-
-// function broadcastWinnersUpdate() {
-//   const scoreTable = getScoreTable();
-//   wss.clients.forEach((client) => {
-//     if (client.readyState === WebSocket.OPEN) {
-//       client.send(JSON.stringify({ type: 'update_winners', scoreTable }));
-//     }
-//   });
-// }
 
 function sendError(ws: WebSocket, message: String) {
   ws.send(JSON.stringify({ type: "error", message }));
