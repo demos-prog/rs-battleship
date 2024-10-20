@@ -1,6 +1,5 @@
 import * as WebSocket from "ws";
 import { NewUser } from "../dto/NewUser.dto";
-import { createRoom, addShips, updateRoom, updateWinnners } from "../..";
 import { GameDto } from "../dto/Game.dto";
 import { DataType } from "../entities/Data.type";
 import { sendError } from "../actions/sendError";
@@ -9,14 +8,15 @@ import {
   addUserToRoom,
   currentUser,
 } from "../actions/registration";
+import { createRoom } from "../actions/createRoom";
+import { updateWinnners } from "../actions/updateWinners";
+import { addShips } from "../actions/addShips";
+import { updateRoom } from "../actions/updateRoom";
 
 export function handleMessage(ws: WebSocket, data: DataType) {
   switch (data.type) {
     case "reg":
-      registration(
-        ws, // Use ws directly
-        data.data as NewUser
-      );
+      registration(ws, data.data as NewUser);
       break;
     case "create_room":
       createRoom(currentUser);

@@ -1,16 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
 import * as WebSocket from "ws";
-import {
-  createGame,
-  players,
-  rooms,
-  sendPersonalResponse,
-  updateRoom,
-  updateWinnners,
-} from "../..";
 import { CreatedUser } from "../dto/CreatedUser.dto";
 import { NewUser } from "../dto/NewUser.dto";
 import { sendError } from "./sendError";
+import { updateWinnners } from "./updateWinners";
+import { createGame } from "./createGame";
+import { sendPersonalResponse } from "./sendPersonalResponse";
+import { updateRoom } from "./updateRoom";
+import { players, rooms } from "../gameData";
 
 export let currentUser: CreatedUser = {
   name: "",
@@ -44,11 +41,7 @@ export function registration(ws: WebSocket, data: NewUser) {
   };
 
   currentUser = createdUser;
-  sendPersonalResponse(
-    ws as unknown as import("ws").WebSocket,
-    "reg",
-    createdUser
-  );
+  sendPersonalResponse(ws, "reg", createdUser);
   updateRoom();
   updateWinnners();
 }
