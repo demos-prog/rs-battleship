@@ -12,6 +12,7 @@
   "keywords": [],
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "uuid": "^10.0.0",
     "ws": "^8.8.0"
   },
