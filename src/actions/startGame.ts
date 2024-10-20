@@ -18,7 +18,7 @@ export function startGame(gameId: string | number) {
 
     const response: StartGameDto = {
       type: "start_game",
-      data: shipsOfPlayer,
+      data: JSON.stringify(shipsOfPlayer),
       id: 0,
     };
     const playerWs = players.get(player.indexPlayer).ws;
