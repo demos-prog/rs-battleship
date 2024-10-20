@@ -3,6 +3,7 @@ import { ShipsOfPlayer } from "../dto/ShipsOfPlayer.dto";
 import { games, players } from "../gameData";
 import { GameType } from "../entities/Game.type";
 import { PlayerType } from "../entities/Player.type";
+import { turn } from "./turn";
 
 export function startGame(gameId: string | number) {
   const game: GameType | undefined = games.get(gameId);
@@ -21,7 +22,7 @@ export function startGame(gameId: string | number) {
       data: JSON.stringify(shipsOfPlayer),
       id: 0,
     };
-    const playerWs = players.get(player.indexPlayer).ws;
-    playerWs.send(JSON.stringify(response));
+    players.get(player.indexPlayer).ws.send(JSON.stringify(response));
+    turn(gameId);
   });
 }
