@@ -20,7 +20,13 @@ export function addShips(gameData: GameDto) {
       player.ships = gameData.ships;
       game.players[game.players.indexOf(player)] = player;
       games.set(gameData.gameId, game);
-      startGame(gameData.gameId);
+
+      const isValiddGame = games
+        .get(gameData.gameId)
+        .players.every((player: PlayerType) => player.ships.length === 10);
+      if (isValiddGame) {
+        startGame(gameData.gameId);
+      }
     } else {
       console.error("Player not found");
     }
