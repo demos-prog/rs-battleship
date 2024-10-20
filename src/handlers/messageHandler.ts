@@ -12,6 +12,7 @@ import { createRoom } from "../actions/createRoom";
 import { updateWinnners } from "../actions/updateWinners";
 import { addShips } from "../actions/addShips";
 import { updateRoom } from "../actions/updateRoom";
+import { startGame } from "../actions/startGame";
 
 export function handleMessage(ws: WebSocket, data: DataType) {
   switch (data.type) {
@@ -30,9 +31,6 @@ export function handleMessage(ws: WebSocket, data: DataType) {
     case "add_ships":
       addShips(data.data as GameDto);
       break;
-    // case 'start_game':
-    //   handleStartGame(ws, data);
-    //   break;
     // case 'attack':
     //   handleAttack(ws, data);
     //   break;

@@ -2,6 +2,7 @@ import { GameDto } from "../dto/Game.dto";
 import { GameType } from "../entities/Game.type";
 import { PlayerType } from "../entities/Player.type";
 import { games } from "../gameData";
+import { startGame } from "./startGame";
 
 export function addShips(gameData: GameDto) {
   if (typeof gameData === "string") {
@@ -19,6 +20,7 @@ export function addShips(gameData: GameDto) {
       player.ships = gameData.ships;
       game.players[game.players.indexOf(player)] = player;
       games.set(gameData.gameId, game);
+      startGame(gameData.gameId);
     } else {
       console.error("Player not found");
     }
