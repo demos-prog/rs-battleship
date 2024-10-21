@@ -31,7 +31,11 @@ export function registration(ws: WebSocket, data: NewUser) {
   }
 
   const playerId = uuidv4();
-  players.set(playerId, { ws, name: usersData.name });
+  players.set(playerId, {
+    ws,
+    name: usersData.name,
+    password: usersData.password,
+  });
 
   const createdUser: CreatedUser = {
     name: usersData.name,

@@ -23,9 +23,31 @@ wss.on("connection", (ws: WebSocket) => {
   });
 
   ws.addEventListener("close", () => {
+    console.log("Connection closed.");
+    ws.terminate();
     // Handle player disconnection
     // Remove player from rooms, games, etc.
   });
+});
+
+const shutdown = () => {
+  console.log("Shutting down WebSocket server...");
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.close();
+    }
+  });
+  wss.close(() => {
+    console.log("WebSocket server closed.");
+    process.exit(0);
+  });
+  console.log("Waiting for connections to close...");
+};
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+process.on("exit", () => {
+  console.log("Process is exiting...");
 });
 
 httpServer.listen(HTTP_PORT, () => {
