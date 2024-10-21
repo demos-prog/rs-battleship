@@ -30,25 +30,24 @@ wss.on("connection", (ws: WebSocket) => {
   });
 });
 
-const shutdown = () => {
+export const shutdown = () => {
   console.log("Shutting down WebSocket server...");
+
+  wss.close(() => {
+    console.log("WebSocket server closed.");
+    process.exit(0);
+  });
+
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.close();
     }
   });
-  wss.close(() => {
-    console.log("WebSocket server closed.");
-    process.exit(0);
-  });
-  console.log("Waiting for connections to close...");
 };
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
-process.on("exit", () => {
-  console.log("Process is exiting...");
-});
+process.on("exit", shutdown);
 
 httpServer.listen(HTTP_PORT, () => {
   console.log(`Server is running on http://localhost:${HTTP_PORT}`);
