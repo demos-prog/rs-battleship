@@ -12,9 +12,11 @@ import { createRoom } from "../actions/createRoom";
 import { updateWinnners } from "../actions/updateWinners";
 import { addShips } from "../actions/addShips";
 import { updateRoom } from "../actions/updateRoom";
+import { attack } from "../actions/attack";
+import { PlayerAttackDto } from "../dto/PlayerAttack.dto";
 
 export function handleMessage(ws: WebSocket, data: DataType) {
-  console.log("Received: ", data.type);
+  console.log("Command from client: ", data.type);
   
   switch (data.type) {
     case "reg":
@@ -32,9 +34,9 @@ export function handleMessage(ws: WebSocket, data: DataType) {
     case "add_ships":
       addShips(data.data as GameDto);
       break;
-    // case 'attack':
-    //   handleAttack(ws, data);
-    //   break;
+    case 'attack':
+      attack(data as PlayerAttackDto);
+      break;
     case "update_room":
       updateRoom();
       break;
