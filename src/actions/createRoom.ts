@@ -16,5 +16,6 @@ export function createRoom(user: CreatedUser) {
   };
 
   rooms.set(newRoom.roomId, newRoom);
+  console.log('Create room');
   updateRoom();
 }

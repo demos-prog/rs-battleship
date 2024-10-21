@@ -23,6 +23,7 @@ export function startGame(gameId: string | number) {
       id: 0,
     };
     players.get(player.indexPlayer).ws.send(JSON.stringify(response));
+    console.log('Start game');
     turn(gameId);
   });
 }

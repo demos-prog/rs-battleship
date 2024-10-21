@@ -89,6 +89,7 @@ export function addUserToRoom(
   });
 
   rooms.set(index, room);
+  console.log('Add user to room');
   updateRoom();
   createGame(index);
 }

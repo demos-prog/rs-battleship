@@ -11,5 +11,7 @@ export function sendPersonalResponse(
     data: JSON.stringify(data),
     id: 0,
   });
+  console.log("Sent: ", type);
+  
   ws.send(response);
 }

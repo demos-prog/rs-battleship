@@ -25,7 +25,7 @@ export function turn(gameId: string | number, nextPlayerId?: number | string) {
     }),
     id: 0,
   };
-
+  console.log("Turn");
   game.players.forEach((player: PlayerType) => {
     players.get(player.indexPlayer).ws.send(JSON.stringify(response));
   });

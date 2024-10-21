@@ -12,9 +12,10 @@ import { createRoom } from "../actions/createRoom";
 import { updateWinnners } from "../actions/updateWinners";
 import { addShips } from "../actions/addShips";
 import { updateRoom } from "../actions/updateRoom";
-import { startGame } from "../actions/startGame";
 
 export function handleMessage(ws: WebSocket, data: DataType) {
+  console.log("Received: ", data.type);
+  
   switch (data.type) {
     case "reg":
       registration(ws, data.data as NewUser);

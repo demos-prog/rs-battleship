@@ -17,4 +17,5 @@ export function updateRoom() {
       client.send(response);
     }
   });
+  console.log('Update room');
 }

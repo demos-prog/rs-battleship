@@ -20,6 +20,7 @@ export function addShips(gameData: GameDto) {
       player.ships = gameData.ships;
       game.players[game.players.indexOf(player)] = player;
       games.set(gameData.gameId, game);
+      console.log('Add ships');
 
       const isValiddGame = games
         .get(gameData.gameId)

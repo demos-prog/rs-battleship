@@ -33,4 +33,5 @@ export function createGame(idGame: number | string) {
     players.get(user.index).ws.send(res);
   });
   games.set(idGame, newGame);
+  console.log('Create game');
 }

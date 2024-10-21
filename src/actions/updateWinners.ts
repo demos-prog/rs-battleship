@@ -12,4 +12,5 @@ export function updateWinnners() {
       client.send(response);
     }
   });
+  console.log("update_winners");
 }
