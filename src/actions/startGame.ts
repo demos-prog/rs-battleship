@@ -32,30 +32,55 @@ export function startGame(gameId: string | number) {
 
   freshGame.players.forEach((player: PlayerType) => {
     let field = [
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
-      ["_", "_", "_", "_", "_", "_", "_", "_", "_", "_"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
+      ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
     ];
 
+    let oneLengthShipsCounter = 1;
+    let twoLengthShipsCounter = 1;
+    let threeLengthShipsCounter = 1;
+    let fourLengthShipsCounter = 1;
+
+    function getShipCounter(shipLength: number) {
+      switch (shipLength) {
+        case 1:
+          return oneLengthShipsCounter++;
+        case 2:
+          return twoLengthShipsCounter++;
+        case 3:
+          return threeLengthShipsCounter++;
+        case 4:
+          return fourLengthShipsCounter++;
+        default:
+          break;
+      }
+    }
+
     player.ships.forEach((ship: ShipType) => {
+      const counter = getShipCounter(ship.length);
       for (let i = 0; i < ship.length; i++) {
         if (ship.direction) {
           if (ship.position.y + i < 10) {
-            field[ship.position.y + i][ship.position.x] = "o";
+            field[ship.position.y + i][ship.position.x] = `S${
+              ship.length
+            }${counter}`;
           } else {
             console.log("y -", ship.position.y);
             console.error("Ship exceeds field boundaries vertically.");
           }
         } else {
           if (ship.position.x + i < 10) {
-            field[ship.position.y][ship.position.x + i] = "o";
+            field[ship.position.y][ship.position.x + i] = `S${
+              ship.length
+            }${counter}`;
           } else {
             console.log("x -", ship.position.x);
             console.error("Ship exceeds field boundaries horizontally.");
@@ -63,6 +88,7 @@ export function startGame(gameId: string | number) {
         }
       }
     });
+
     console.log("FIELD");
     field.forEach((row) => {
       console.log(row.join(" "));
