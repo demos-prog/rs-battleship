@@ -1,10 +1,9 @@
 export interface FieldsDataType {
-  firstPlayer: {
+  players: [{
     indexPlayer: string | number;
     field: string[][];
-  };
-  secondPlayer: {
+  },{
     indexPlayer: string | number;
     field: string[][];
-  };
+  }]
 }

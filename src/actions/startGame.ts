@@ -30,8 +30,7 @@ export function startGame(gameId: string | number) {
     };
     players.get(player.indexPlayer).ws.send(JSON.stringify(response));
     console.log("Start game");
-    turn(gameId);
-
+    
     let field: string[][] = [
       ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
       ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
@@ -94,24 +93,28 @@ export function startGame(gameId: string | number) {
   });
 
   const data: FieldsDataType = {
-    firstPlayer: {
-      indexPlayer: game.players[0].indexPlayer,
-      field: fieldOfFirstPlayer,
-    },
-    secondPlayer: {
-      indexPlayer: game.players[1].indexPlayer,
-      field: fieldOfSecondPlayer,
-    },
+    players: [
+      {
+        indexPlayer: game.players[0].indexPlayer,
+        field: fieldOfFirstPlayer,
+      },
+      {
+        indexPlayer: game.players[1].indexPlayer,
+        field: fieldOfSecondPlayer,
+      },
+    ],
   };
 
   fieldsData.set(gameId, data);
-  const dt: FieldsDataType = fieldsData.get(gameId);
-  console.log("FIELD of the firstPlayer: ");
-  dt.firstPlayer.field.forEach((row) => {
-    console.log(row.join(" "));
-  });
-  console.log("FIELD of the secondPlayer:");
-  dt.secondPlayer.field.forEach((row) => {
-    console.log(row.join(" "));
-  });
+
+  turn(gameId);
+  // const dt: FieldsDataType = fieldsData.get(gameId);
+  // console.log("FIELD of the firstPlayer: ");
+  // dt.firstPlayer.field.forEach((row) => {
+  //   console.log(row.join(" "));
+  // });
+  // console.log("FIELD of the secondPlayer:");
+  // dt.secondPlayer.field.forEach((row) => {
+  //   console.log(row.join(" "));
+  // });
 }

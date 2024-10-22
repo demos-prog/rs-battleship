@@ -1,7 +1,8 @@
 import { PlayerAttackDto } from "../dto/PlayerAttack.dto";
+import { FieldsDataType } from "../entities/FieldsData.type";
 import { GameType } from "../entities/Game.type";
 import { PlayerType } from "../entities/Player.type";
-import { games } from "../gameData";
+import { fieldsData, games } from "../gameData";
 
 export function attack(attackData: PlayerAttackDto) {
   if (typeof attackData === "string") {
@@ -14,10 +15,7 @@ export function attack(attackData: PlayerAttackDto) {
     data = JSON.parse(attackData.data);
   }
 
-  console.log("data -", data);
-
   const game: GameType = games.get(data.gameId);
-  console.log("game -", game);
 
   const victimPalyer: PlayerType | undefined = game.players.find(
     (player: PlayerType) => {
@@ -25,5 +23,20 @@ export function attack(attackData: PlayerAttackDto) {
     }
   );
 
-  
+  let fieldData: FieldsDataType = fieldsData.get(data.gameId);
+
+  let victimField = fieldData.players.find((player) => {
+    return player.indexPlayer === victimPalyer?.indexPlayer;
+  })?.field;
+
+  victimField?.forEach((row) => {
+    console.log(row.join(" "));
+  });
+
+  if (victimField) {
+    const target = victimField[data.y][data.x];
+    console.log(target);
+  } else {
+    console.log("victimField is undefined");
+  }
 }
