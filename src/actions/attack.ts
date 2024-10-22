@@ -19,7 +19,7 @@ export function attack(attackData: PlayerAttackDto) {
   const game: GameType = games.get(data.gameId);
   console.log("game -", game);
 
-  const attackedPalyer: PlayerType | undefined = game.players.find(
+  const victimPalyer: PlayerType | undefined = game.players.find(
     (player: PlayerType) => {
       return player.indexPlayer !== data.indexPlayer;
     }

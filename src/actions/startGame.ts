@@ -13,7 +13,11 @@ export function startGame(gameId: string | number) {
     console.error("Game not found");
     return;
   }
-  game.players.forEach((player: PlayerType) => {
+
+  let fieldOfFirstPlayer: string[][] = [];
+  let fieldOfSecondPlayer: string[][] = [];
+
+  game.players.forEach((player: PlayerType, index: number) => {
     const shipsOfPlayer: ShipsOfPlayer = {
       ships: player.ships,
       currentPlayerIndex: player.indexPlayer,
@@ -27,11 +31,7 @@ export function startGame(gameId: string | number) {
     players.get(player.indexPlayer).ws.send(JSON.stringify(response));
     console.log("Start game");
     turn(gameId);
-  });
 
-  const freshGame: GameType = games.get(gameId);
-
-  freshGame.players.forEach((player: PlayerType) => {
     let field: string[][] = [
       ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
       ["___", "___", "___", "___", "___", "___", "___", "___", "___", "___"],
@@ -90,26 +90,28 @@ export function startGame(gameId: string | number) {
       }
     });
 
-    const data: FieldsDataType = {
-      firstPlayer: {
-        indexPlayer: game.players[0].indexPlayer,
-        field,
-      },
-      secondPlayer: {
-        indexPlayer: game.players[0].indexPlayer,
-        field,
-      },
-    };
+    index === 0 ? (fieldOfFirstPlayer = field) : (fieldOfSecondPlayer = field);
+  });
 
-    fieldsData.set(gameId, data);
-    const dt: FieldsDataType = fieldsData.get(gameId);
-    console.log("FIELD of the firstPlayer: ");
-    dt.firstPlayer.field.forEach((row) => {
-      console.log(row.join(" "));
-    });
-    console.log("FIELD of the secondPlayer:");
-    dt.secondPlayer.field.forEach((row) => {
-      console.log(row.join(" "));
-    });
+  const data: FieldsDataType = {
+    firstPlayer: {
+      indexPlayer: game.players[0].indexPlayer,
+      field: fieldOfFirstPlayer,
+    },
+    secondPlayer: {
+      indexPlayer: game.players[1].indexPlayer,
+      field: fieldOfSecondPlayer,
+    },
+  };
+
+  fieldsData.set(gameId, data);
+  const dt: FieldsDataType = fieldsData.get(gameId);
+  console.log("FIELD of the firstPlayer: ");
+  dt.firstPlayer.field.forEach((row) => {
+    console.log(row.join(" "));
+  });
+  console.log("FIELD of the secondPlayer:");
+  dt.secondPlayer.field.forEach((row) => {
+    console.log(row.join(" "));
   });
 }
