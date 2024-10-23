@@ -1,7 +1,7 @@
 import { FinishDto } from "../dto/Finish.dto";
 import { FieldsDataType } from "../entities/FieldsData.type";
 import { ScoreTableItem } from "../entities/ScoreTableItem.type";
-import { fieldsData, players, scoreTable } from "../gameData";
+import { fieldsData, players, rooms, scoreTable } from "../gameData";
 import { updateWinnners } from "./updateWinners";
 
 export function checkFinish(gameId: string | number) {
@@ -50,7 +50,7 @@ export function checkFinish(gameId: string | number) {
       };
       scoreTable.set(winnerIndex, newdWinner);
     }
-
+    rooms.delete(gameId);
     updateWinnners();
   }
 }

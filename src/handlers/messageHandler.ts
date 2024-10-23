@@ -5,7 +5,6 @@ import { DataType } from "../entities/Data.type";
 import { sendError } from "../actions/sendError";
 import {
   registration,
-  addUserToRoom,
   currentUser,
 } from "../actions/registration";
 import { createRoom } from "../actions/createRoom";
@@ -16,6 +15,7 @@ import { attack } from "../actions/attack";
 import { PlayerAttackDto } from "../dto/PlayerAttack.dto";
 import { RandomAttackDto } from "../dto/RandomAttack.dto";
 import { randomAttack } from "../actions/randomAttack";
+import { addUserToRoom } from "../actions/addUserToRoom";
 
 export function handleMessage(ws: WebSocket, data: DataType) {
   console.log("Command from client: ", data.type);

@@ -4,10 +4,9 @@ import { CreatedUser } from "../dto/CreatedUser.dto";
 import { NewUser } from "../dto/NewUser.dto";
 import { sendError } from "./sendError";
 import { updateWinnners } from "./updateWinners";
-import { createGame } from "./createGame";
 import { sendPersonalResponse } from "./sendPersonalResponse";
 import { updateRoom } from "./updateRoom";
-import { players, rooms } from "../gameData";
+import { players } from "../gameData";
 
 export let currentUser: CreatedUser = {
   name: "",
@@ -48,48 +47,4 @@ export function registration(ws: WebSocket, data: NewUser) {
   sendPersonalResponse(ws, "reg", createdUser);
   updateRoom();
   updateWinnners();
-}
-
-// add youself to somebodys room, then remove the room from available rooms list
-export function addUserToRoom(
-  ws: WebSocket,
-  data: { indexRoom: number | string }
-) {
-  let index: string;
-  if (typeof data === "string") {
-    index = JSON.parse(data).indexRoom;
-  } else if (typeof data.indexRoom === "string") {
-    index = data.indexRoom;
-  } else {
-    console.error("Invalid indexRoom type");
-    return;
-  }
-
-  const room = rooms.get(index);
-  if (!room) {
-    console.error("Room not found");
-    return;
-  }
-
-  if (room.roomUsers[0].index === currentUser.index) {
-    ws.send(
-      JSON.stringify({
-        type: "error",
-        data: "You are already in this room",
-        id: 0,
-      })
-    );
-    console.log("You are already in this room");
-    return;
-  }
-
-  room.roomUsers.push({
-    name: currentUser.name,
-    index: currentUser.index,
-  });
-
-  rooms.set(index, room);
-  console.log('Add user to room');
-  updateRoom();
-  createGame(index);
 }
