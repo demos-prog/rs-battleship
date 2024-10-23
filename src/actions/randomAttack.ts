@@ -58,12 +58,12 @@ export function randomAttack(attackData: RandomAttackDto) {
         status = "miss";
       } else {
         victimField[newData.y][newData.x] = `H${targetCell.slice(1)}`;
+        status = "killed";
         for (let i = 0; i < victimField.length; i++) {
           const row = victimField[i];
           if (row.includes(targetCell)) {
             status = "shot";
-          } else {
-            status = "killed";
+            break;
           }
         }
       }

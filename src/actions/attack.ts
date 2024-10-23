@@ -37,8 +37,6 @@ export function attack(attackData: PlayerAttackDto) {
 
     if (victimField) {
       const targetCell = victimField[data.y][data.x];
-      console.log(targetCell);
-
       let status: "miss" | "killed" | "shot" = "miss";
       // Miss condition
       if (
@@ -50,12 +48,12 @@ export function attack(attackData: PlayerAttackDto) {
         status = "miss";
       } else {
         victimField[data.y][data.x] = `H${targetCell.slice(1)}`;
+        status = "killed";
         for (let i = 0; i < victimField.length; i++) {
           const row = victimField[i];
           if (row.includes(targetCell)) {
             status = "shot";
-          } else {
-            status = "killed";
+            break;
           }
         }
       }
