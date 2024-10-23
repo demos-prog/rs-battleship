@@ -5,6 +5,7 @@ import { sendError } from "./src/actions/sendError";
 import { DataType } from "./src/entities/Data.type";
 import { handleMessage } from "./src/handlers/messageHandler";
 import { httpServer } from "./src/httpServer";
+import { handlePlayerdDisconnect } from "./src/actions/handlePlayerdDisconnect";
 
 export const wss = new WebSocketServer({ server: httpServer });
 const HTTP_PORT = process.env.HTTP_PORT;
@@ -25,8 +26,7 @@ wss.on("connection", (ws: WebSocket) => {
   ws.addEventListener("close", () => {
     console.log("Connection closed.");
     ws.terminate();
-    // Handle player disconnection
-    // Remove player from rooms, games, etc.
+    handlePlayerdDisconnect(ws);
   });
 });
 
