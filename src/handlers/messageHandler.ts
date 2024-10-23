@@ -16,6 +16,7 @@ import { PlayerAttackDto } from "../dto/PlayerAttack.dto";
 import { RandomAttackDto } from "../dto/RandomAttack.dto";
 import { randomAttack } from "../actions/randomAttack";
 import { addUserToRoom } from "../actions/addUserToRoom";
+import { AddUserToRoomDto } from "../dto/AddUserToRoom.dto";
 
 export function handleMessage(ws: WebSocket, data: DataType) {
   console.log("Command from client: ", data.type);
@@ -31,7 +32,7 @@ export function handleMessage(ws: WebSocket, data: DataType) {
       updateWinnners();
       break;
     case "add_user_to_room":
-      addUserToRoom(ws, data.data as { indexRoom: number | string });
+      addUserToRoom(data as AddUserToRoomDto);
       break;
     case "add_ships":
       addShips(data.data as GameDto);

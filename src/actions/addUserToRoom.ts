@@ -1,38 +1,22 @@
+import { AddUserToRoomDto } from "../dto/AddUserToRoom.dto";
 import { rooms } from "../gameData";
-import * as WebSocket from "ws";
 import { createGame } from "./createGame";
 import { currentUser } from "./registration";
 import { updateRoom } from "./updateRoom";
 
-export function addUserToRoom(
-  ws: WebSocket,
-  data: { indexRoom: number | string }
-) {
-  let index: string;
-  if (typeof data === "string") {
-    index = JSON.parse(data).indexRoom;
-  } else if (typeof data.indexRoom === "string") {
-    index = data.indexRoom;
-  } else {
-    console.error("Invalid indexRoom type");
-    return;
+export function addUserToRoom(dto: AddUserToRoomDto) {
+  let data = dto.data;
+  if (typeof dto.data === "string") {
+    data = JSON.parse(dto.data);
   }
+  console.log('name- ', currentUser.name);
+ 
+  
+  const indexRoom = data.indexRoom;
 
-  const room = rooms.get(index);
+  const room = rooms.get(indexRoom);
   if (!room) {
     console.error("Room not found");
-    return;
-  }
-
-  if (room.roomUsers[0].index === currentUser.index) {
-    ws.send(
-      JSON.stringify({
-        type: "error",
-        data: "You are already in this room",
-        id: 0,
-      })
-    );
-    console.log("You are already in this room");
     return;
   }
 
@@ -41,8 +25,8 @@ export function addUserToRoom(
     index: currentUser.index,
   });
 
-  rooms.set(index, room);
-  console.log('Add user to room');
+  rooms.set(indexRoom, room);
+  console.log("Add user to room");
   updateRoom();
-  createGame(index);
+  createGame(indexRoom);
 }
