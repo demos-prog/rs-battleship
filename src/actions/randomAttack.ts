@@ -73,9 +73,9 @@ export function randomAttack(attackData: RandomAttackDto) {
 
       checkFinish(data.gameId);
       // can be removed
-      victimField.forEach((row) => {
-        console.log(row.join(" "));
-      });
+      // victimField.forEach((row) => {
+      //   console.log(row.join(" "));
+      // });
 
       fieldData.players[i].field = victimField;
       fieldsData.set(newData.gameId, fieldData);

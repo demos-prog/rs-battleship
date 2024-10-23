@@ -61,9 +61,9 @@ export function attack(attackData: PlayerAttackDto) {
 
       checkFinish(data.gameId);
       // can be removed
-      victimField.forEach((row) => {
-        console.log(row.join(" "));
-      });
+      // victimField.forEach((row) => {
+      //   console.log(row.join(" "));
+      // });
 
       fieldData.players[i].field = victimField;
       fieldsData.set(data.gameId, fieldData);
