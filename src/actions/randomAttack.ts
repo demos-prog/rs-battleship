@@ -70,8 +70,7 @@ export function randomAttack(attackData: RandomAttackDto) {
           }
         }
       }
-
-      checkFinish(data.gameId);
+      
       // can be removed
       // victimField.forEach((row) => {
       //   console.log(row.join(" "));
@@ -100,6 +99,7 @@ export function randomAttack(attackData: RandomAttackDto) {
         status === "miss" ? victimPalyer.indexPlayer : newData.indexPlayer;
 
       turn(newData.gameId, nextPlayerIndex);
+      checkFinish(data.gameId);
     }
   } else {
     console.log("victimField is undefined");

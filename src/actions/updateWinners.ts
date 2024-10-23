@@ -1,10 +1,13 @@
 import { wss } from "../..";
+import { ScoreTableItem } from "../entities/ScoreTableItem.type";
 import { scoreTable } from "../gameData";
 
 export function updateWinnners() {
+  const array: ScoreTableItem[] = Array.from(scoreTable.values());
+
   const response = JSON.stringify({
     type: "update_winners",
-    data: JSON.stringify(scoreTable.sort((a, b) => b.wins - a.wins)),
+    data: JSON.stringify(array.sort((a, b) => a.wins - b.wins)),
     id: 0,
   });
   wss.clients.forEach((client) => {

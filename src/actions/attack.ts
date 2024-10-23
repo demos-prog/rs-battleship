@@ -59,12 +59,6 @@ export function attack(attackData: PlayerAttackDto) {
         }
       }
 
-      checkFinish(data.gameId);
-      // can be removed
-      // victimField.forEach((row) => {
-      //   console.log(row.join(" "));
-      // });
-
       fieldData.players[i].field = victimField;
       fieldsData.set(data.gameId, fieldData);
 
@@ -88,6 +82,7 @@ export function attack(attackData: PlayerAttackDto) {
         status === "miss" ? victimPalyer.indexPlayer : data.indexPlayer;
 
       turn(data.gameId, nextPlayerIndex);
+      checkFinish(data.gameId);
     }
   } else {
     console.log("victimField is undefined");
