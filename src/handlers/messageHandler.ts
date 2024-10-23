@@ -14,6 +14,8 @@ import { addShips } from "../actions/addShips";
 import { updateRoom } from "../actions/updateRoom";
 import { attack } from "../actions/attack";
 import { PlayerAttackDto } from "../dto/PlayerAttack.dto";
+import { RandomAttackDto } from "../dto/RandomAttack.dto";
+import { randomAttack } from "../actions/randomAttack";
 
 export function handleMessage(ws: WebSocket, data: DataType) {
   console.log("Command from client: ", data.type);
@@ -36,6 +38,9 @@ export function handleMessage(ws: WebSocket, data: DataType) {
       break;
     case 'attack':
       attack(data as PlayerAttackDto);
+      break;
+    case 'randomAttack':
+      randomAttack(data as unknown as RandomAttackDto);
       break;
     case "update_room":
       updateRoom();

@@ -1,12 +1,12 @@
 import { AttackResponseDto } from "../dto/AttackResponse.dto";
-import { PlayerAttackDto } from "../dto/PlayerAttack.dto";
+import { RandomAttackDto } from "../dto/RandomAttack.dto";
 import { FieldsDataType } from "../entities/FieldsData.type";
 import { GameType } from "../entities/Game.type";
 import { PlayerType } from "../entities/Player.type";
 import { fieldsData, games, players } from "../gameData";
 import { turn } from "./turn";
 
-export function attack(attackData: PlayerAttackDto) {
+export function randomAttack(attackData: RandomAttackDto) {
   if (typeof attackData === "string") {
     attackData = JSON.parse(attackData);
   }
@@ -24,6 +24,7 @@ export function attack(attackData: PlayerAttackDto) {
       return player.indexPlayer !== data.indexPlayer;
     }
   );
+
   if (victimPalyer) {
     let fieldData: FieldsDataType = fieldsData.get(data.gameId);
 
@@ -36,20 +37,27 @@ export function attack(attackData: PlayerAttackDto) {
     )?.field;
 
     if (victimField) {
-      const targetCell = victimField[data.y][data.x];
-      console.log(targetCell);
+      // random attack
+      let newData = {
+        x: Math.floor(Math.random() * 10),
+        y: Math.floor(Math.random() * 10),
+        indexPlayer: data.indexPlayer,
+        gameId: data.gameId,
+      };
+      let targetCell = "";
+      do {
+        (newData.x = Math.floor(Math.random() * 10)),
+          (newData.y = Math.floor(Math.random() * 10)),
+          (targetCell = victimField[newData.y][newData.x]);
+      } while (targetCell === "_X_" || targetCell.startsWith("H"));
 
       let status: "miss" | "killed" | "shot" = "miss";
       // Miss condition
-      if (
-        targetCell === "___" ||
-        targetCell === "_X_" ||
-        targetCell.startsWith("H")
-      ) {
-        victimField[data.y][data.x] = "_X_";
+      if (targetCell === "___") {
+        victimField[newData.y][newData.x] = "_X_";
         status = "miss";
       } else {
-        victimField[data.y][data.x] = `H${targetCell.slice(1)}`;
+        victimField[newData.y][newData.x] = `H${targetCell.slice(1)}`;
         for (let i = 0; i < victimField.length; i++) {
           const row = victimField[i];
           if (row.includes(targetCell)) {
@@ -61,16 +69,16 @@ export function attack(attackData: PlayerAttackDto) {
       }
 
       fieldData.players[i].field = victimField;
-      fieldsData.set(data.gameId, fieldData);
+      fieldsData.set(newData.gameId, fieldData);
 
       const res: AttackResponseDto = {
         type: "attack",
         data: JSON.stringify({
           position: {
-            x: data.x,
-            y: data.y,
+            x: newData.x,
+            y: newData.y,
           },
-          currentPlayer: data.indexPlayer,
+          currentPlayer: newData.indexPlayer,
           status,
         }),
         id: 0,
@@ -80,9 +88,9 @@ export function attack(attackData: PlayerAttackDto) {
         players.get(player.indexPlayer).ws.send(JSON.stringify(res));
       });
       const nextPlayerIndex =
-        status === "miss" ? victimPalyer.indexPlayer : data.indexPlayer;
+        status === "miss" ? victimPalyer.indexPlayer : newData.indexPlayer;
 
-      turn(data.gameId, nextPlayerIndex);
+      turn(newData.gameId, nextPlayerIndex);
     }
   } else {
     console.log("victimField is undefined");
