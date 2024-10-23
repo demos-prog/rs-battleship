@@ -1,8 +1,10 @@
+import { AttackResponseDto } from "../dto/AttackResponse.dto";
 import { PlayerAttackDto } from "../dto/PlayerAttack.dto";
 import { FieldsDataType } from "../entities/FieldsData.type";
 import { GameType } from "../entities/Game.type";
 import { PlayerType } from "../entities/Player.type";
-import { fieldsData, games } from "../gameData";
+import { fieldsData, games, players } from "../gameData";
+import { turn } from "./turn";
 
 export function attack(attackData: PlayerAttackDto) {
   if (typeof attackData === "string") {
@@ -22,20 +24,59 @@ export function attack(attackData: PlayerAttackDto) {
       return player.indexPlayer !== data.indexPlayer;
     }
   );
+  if (victimPalyer) {
+    let fieldData: FieldsDataType = fieldsData.get(data.gameId);
 
-  let fieldData: FieldsDataType = fieldsData.get(data.gameId);
+    let i = 0;
+    let victimField = fieldData.players.find((player, ind) => {
+      i = ind;
+      return player.indexPlayer === victimPalyer?.indexPlayer;
+    })?.field;
 
-  let victimField = fieldData.players.find((player) => {
-    return player.indexPlayer === victimPalyer?.indexPlayer;
-  })?.field;
+    if (victimField) {
+      const targetCell = victimField[data.y][data.x];
+      console.log(targetCell);
 
-  victimField?.forEach((row) => {
-    console.log(row.join(" "));
-  });
+      let status: "miss" | "killed" | "shot" = "miss";
+      // Miss condition
+      if (targetCell === "___" || targetCell === "_X_") {
+        victimField[data.y][data.x] = "_X_";
+        status = "miss";
+      } else {
+        victimField[data.y][data.x] = "_X_";
+        for (let i = 0; i < victimField.length; i++) {
+          const row = victimField[i];
+          if (row.includes(targetCell)) {
+            status = "shot";
+          } else {
+            status = "killed";
+          }
+        }
+      }
 
-  if (victimField) {
-    const target = victimField[data.y][data.x];
-    console.log(target);
+      fieldData.players[i].field = victimField;
+      fieldsData.set(data.gameId, fieldData);
+
+      const res: AttackResponseDto = {
+        type: "attack",
+        data: JSON.stringify({
+          position: {
+            x: data.x,
+            y: data.y,
+          },
+          currentPlayer: data.indexPlayer,
+          status,
+        }),
+        id: 0,
+      };
+      game.players.forEach((player: PlayerType) => {
+        players.get(player.indexPlayer).ws.send(JSON.stringify(res));
+      });
+      const nextPlayerIndex =
+        status === "miss" ? victimPalyer.indexPlayer : data.indexPlayer;
+
+      turn(data.gameId, nextPlayerIndex);
+    }
   } else {
     console.log("victimField is undefined");
   }
