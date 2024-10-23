@@ -57,7 +57,9 @@ export function randomAttack(attackData: RandomAttackDto) {
         victimField[newData.y][newData.x] = "_X_";
         status = "miss";
       } else {
-        victimField[newData.y][newData.x] = `H${targetCell.slice(1)}`;
+        victimField[newData.y][newData.x] = `H${victimField[newData.y][
+          newData.x
+        ].slice(1)}`;
         status = "killed";
         for (let i = 0; i < victimField.length; i++) {
           const row = victimField[i];
@@ -67,6 +69,11 @@ export function randomAttack(attackData: RandomAttackDto) {
           }
         }
       }
+      
+      // can be removed
+      victimField.forEach((row) => {
+        console.log(row.join(" "));
+      });
 
       fieldData.players[i].field = victimField;
       fieldsData.set(newData.gameId, fieldData);
