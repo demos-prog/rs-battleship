@@ -7,13 +7,7 @@ import { updateWinnners } from "./updateWinners";
 import { sendPersonalResponse } from "./sendPersonalResponse";
 import { updateRoom } from "./updateRoom";
 import { players } from "../gameData";
-
-export let currentUser: CreatedUser = {
-  name: "",
-  index: "",
-  error: false,
-  errorText: "",
-};
+import { PlayerDataType } from "../entities/PlayerData.type";
 
 export function registration(ws: WebSocket, data: NewUser) {
   let usersData: NewUser;
@@ -30,11 +24,14 @@ export function registration(ws: WebSocket, data: NewUser) {
   }
 
   const playerId = uuidv4();
-  players.set(playerId, {
+
+  const newPlayer: PlayerDataType = {
     ws,
     name: usersData.name,
     password: usersData.password,
-  });
+    index: playerId,
+  };
+  players.set(playerId, newPlayer);
 
   const createdUser: CreatedUser = {
     name: usersData.name,
@@ -43,7 +40,6 @@ export function registration(ws: WebSocket, data: NewUser) {
     errorText: "No errors",
   };
 
-  currentUser = createdUser;
   sendPersonalResponse(ws, "reg", createdUser);
   updateRoom();
   updateWinnners();

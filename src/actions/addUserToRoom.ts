@@ -1,17 +1,20 @@
 import { AddUserToRoomDto } from "../dto/AddUserToRoom.dto";
-import { rooms } from "../gameData";
+import * as WebSocket from "ws";
+import { players, rooms } from "../gameData";
 import { createGame } from "./createGame";
-import { currentUser } from "./registration";
 import { updateRoom } from "./updateRoom";
+import { PlayerDataType } from "../entities/PlayerData.type";
 
-export function addUserToRoom(dto: AddUserToRoomDto) {
+export function addUserToRoom(ws: WebSocket, dto: AddUserToRoomDto) {
   let data = dto.data;
   if (typeof dto.data === "string") {
     data = JSON.parse(dto.data);
   }
-  console.log('name- ', currentUser.name);
- 
-  
+
+  const user: PlayerDataType = Array.from(players.values()).find(
+    (player) => player.ws === ws
+  );
+
   const indexRoom = data.indexRoom;
 
   const room = rooms.get(indexRoom);
@@ -21,8 +24,8 @@ export function addUserToRoom(dto: AddUserToRoomDto) {
   }
 
   room.roomUsers.push({
-    name: currentUser.name,
-    index: currentUser.index,
+    name: user.name,
+    index: user.index,
   });
 
   rooms.set(indexRoom, room);

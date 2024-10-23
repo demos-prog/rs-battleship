@@ -1,10 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
-import { CreatedUser } from "../dto/CreatedUser.dto";
 import { RoomType } from "../entities/Room.type";
+import * as WebSocket from "ws";
 import { updateRoom } from "./updateRoom";
-import { rooms } from "../gameData";
+import { players, rooms } from "../gameData";
+import { PlayerDataType } from "../entities/PlayerData.type";
 
-export function createRoom(user: CreatedUser) {
+export function createRoom(ws: WebSocket) {
+  const user: PlayerDataType = Array.from(players.values()).find(
+    (player) => player.ws === ws
+  );
+
   const newRoom: RoomType = {
     roomId: uuidv4(),
     roomUsers: [
