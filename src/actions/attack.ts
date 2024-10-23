@@ -4,6 +4,7 @@ import { FieldsDataType } from "../entities/FieldsData.type";
 import { GameType } from "../entities/Game.type";
 import { PlayerType } from "../entities/Player.type";
 import { fieldsData, games, players } from "../gameData";
+import { checkFinish } from "./checkFinish";
 import { turn } from "./turn";
 
 export function attack(attackData: PlayerAttackDto) {
@@ -58,6 +59,7 @@ export function attack(attackData: PlayerAttackDto) {
         }
       }
 
+      checkFinish(data.gameId);
       // can be removed
       victimField.forEach((row) => {
         console.log(row.join(" "));
