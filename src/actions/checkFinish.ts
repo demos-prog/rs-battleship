@@ -15,12 +15,14 @@ export function checkFinish(gameId: string | number) {
   );
 
   if (!firstIsAlive || !secondIsAlive) {
+    const winnerIndex = firstIsAlive
+      ? field.players[0].indexPlayer
+      : field.players[1].indexPlayer;
+
     const res: FinishDto = {
       type: "finish",
       data: JSON.stringify({
-        winPlayer: firstIsAlive
-          ? field.players[0].indexPlayer
-          : field.players[1].indexPlayer,
+        winPlayer: winnerIndex,
       }),
       id: 0,
     };
@@ -28,10 +30,6 @@ export function checkFinish(gameId: string | number) {
     field.players.forEach((player) => {
       players.get(player.indexPlayer).ws.send(JSON.stringify(res));
     });
-
-    const winnerIndex = firstIsAlive
-      ? field.players[0].indexPlayer
-      : field.players[1].indexPlayer;
 
     const winnerName = players.get(winnerIndex).name;
 
