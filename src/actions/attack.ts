@@ -3,7 +3,7 @@ import { PlayerAttackDto } from "../dto/PlayerAttack.dto";
 import { FieldsDataType } from "../entities/FieldsData.type";
 import { GameType } from "../entities/Game.type";
 import { PlayerType } from "../entities/Player.type";
-import { fieldsData, games, players } from "../gameData";
+import { fieldsData, games, players, turns } from "../gameData";
 import { checkFinish } from "./checkFinish";
 import { turn } from "./turn";
 
@@ -13,6 +13,11 @@ export function attack(attackData: PlayerAttackDto) {
   }
 
   let data = attackData.data;
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
+
+  const currentAttackerIndex = data.indexPlayer;
 
   if (typeof attackData.data === "string") {
     data = JSON.parse(attackData.data);
@@ -22,7 +27,7 @@ export function attack(attackData: PlayerAttackDto) {
 
   const victimPalyer: PlayerType | undefined = game.players.find(
     (player: PlayerType) => {
-      return player.indexPlayer !== data.indexPlayer;
+      return player.indexPlayer !== currentAttackerIndex;
     }
   );
   if (victimPalyer) {
@@ -59,6 +64,18 @@ export function attack(attackData: PlayerAttackDto) {
         }
       }
 
+      // ДОРАБОТАТЬ
+      const prevAttackerIndex = turns.get(data.gameId);
+
+      if (status === "shot" || status === "killed") {
+        turns.set(data.gameId, currentAttackerIndex);
+      } else {
+        if (prevAttackerIndex === currentAttackerIndex) {
+          return;
+        }
+        turns.set(data.gameId, currentAttackerIndex);
+      }
+
       fieldData.players[i].field = victimField;
       fieldsData.set(data.gameId, fieldData);
 
@@ -69,7 +86,7 @@ export function attack(attackData: PlayerAttackDto) {
             x: data.x,
             y: data.y,
           },
-          currentPlayer: data.indexPlayer,
+          currentPlayer: currentAttackerIndex,
           status,
         }),
         id: 0,
@@ -79,7 +96,7 @@ export function attack(attackData: PlayerAttackDto) {
         players.get(player.indexPlayer).ws.send(JSON.stringify(res));
       });
       const nextPlayerIndex =
-        status === "miss" ? victimPalyer.indexPlayer : data.indexPlayer;
+        status === "miss" ? victimPalyer.indexPlayer : currentAttackerIndex;
 
       turn(data.gameId, nextPlayerIndex);
       checkFinish(data.gameId);
