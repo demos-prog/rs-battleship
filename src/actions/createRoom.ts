@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { RoomType } from "../entities/Room.type";
-import * as WebSocket from "ws";
+import WebSocket from "ws";
 import { updateRoom } from "./updateRoom";
 import { players, rooms } from "../gameData";
 import { PlayerDataType } from "../entities/PlayerData.type";

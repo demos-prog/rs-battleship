@@ -1,5 +1,5 @@
 import { CreatedUser } from "../dto/CreatedUser.dto";
-import * as WebSocket from "ws";
+import WebSocket from "ws";
 
 export function sendPersonalResponse(
   ws: WebSocket,

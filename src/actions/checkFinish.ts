@@ -49,6 +49,7 @@ export function checkFinish(gameId: string | number) {
       scoreTable.set(winnerIndex, newdWinner);
     }
     rooms.delete(gameId);
+    console.log('finish');
     updateWinnners();
   }
 }

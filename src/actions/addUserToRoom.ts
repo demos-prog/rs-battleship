@@ -1,5 +1,5 @@
 import { AddUserToRoomDto } from "../dto/AddUserToRoom.dto";
-import * as WebSocket from "ws";
+import WebSocket from "ws";
 import { createGame } from "./createGame";
 import { updateRoom } from "./updateRoom";
 import { getUsersData } from "./getUsersData";

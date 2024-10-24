@@ -1,4 +1,4 @@
-import * as WebSocket from "ws";
+import WebSocket from "ws";
 import { PlayerDataType } from "../entities/PlayerData.type";
 import { players } from "../gameData";
 

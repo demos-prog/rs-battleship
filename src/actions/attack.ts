@@ -66,10 +66,12 @@ export function attack(attackData: PlayerAttackDto) {
 
       if (status === "shot" || status === "killed") {
         if (prevAttackerIndex === currentAttackerIndex) {
+          victimField[data.y][data.x] = targetCell;
           return;
         }
       } else {
         if (prevAttackerIndex === currentAttackerIndex) {
+          victimField[data.y][data.x] = targetCell;
           return;
         }
         turns.set(data.gameId, currentAttackerIndex);

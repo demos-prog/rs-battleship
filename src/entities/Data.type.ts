@@ -1,17 +1,18 @@
 export interface DataType {
   type:
-    | "reg" // done
-    | "update_winners" // done
-    | "create_room" // done
-    | "add_user_to_room" //done
-    | "create_game" //done
-    | "update_room" // done
+    | "reg"
+    | "update_winners"
+    | "create_room"
+    | "add_user_to_room"
+    | "create_game"
+    | "update_room"
     | "add_ships"
     | "start_game"
     | "attack"
     | "randomAttack"
     | "turn"
-    | "finish";
+    | "finish"
+    | "single_play";
   data: object | string;
   id: 0;
 }

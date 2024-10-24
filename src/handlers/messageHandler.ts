@@ -1,4 +1,4 @@
-import * as WebSocket from "ws";
+import WebSocket from "ws";
 import { NewUser } from "../dto/NewUser.dto";
 import { GameDto } from "../dto/Game.dto";
 import { DataType } from "../entities/Data.type";
@@ -14,6 +14,7 @@ import { RandomAttackDto } from "../dto/RandomAttack.dto";
 import { randomAttack } from "../actions/randomAttack";
 import { addUserToRoom } from "../actions/addUserToRoom";
 import { AddUserToRoomDto } from "../dto/AddUserToRoom.dto";
+import { singlePlay } from "../actions/singlePlay";
 
 export function handleMessage(ws: WebSocket, data: DataType) {
   console.log("Command from client: ", data.type);
@@ -42,6 +43,9 @@ export function handleMessage(ws: WebSocket, data: DataType) {
       break;
     case "update_room":
       updateRoom();
+      break;
+    case "single_play":
+      singlePlay(ws);
       break;
 
     default:
