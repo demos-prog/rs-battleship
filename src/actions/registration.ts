@@ -25,6 +25,8 @@ export function registration(ws: WebSocket, data: NewUser) {
 
   const playerId = uuidv4();
 
+  const existingPlayer: PlayerDataType | undefined = players.get(playerId);
+
   const newPlayer: PlayerDataType = {
     ws,
     name: usersData.name,
@@ -33,12 +35,24 @@ export function registration(ws: WebSocket, data: NewUser) {
   };
   players.set(playerId, newPlayer);
 
-  const createdUser: CreatedUser = {
+  let createdUser: CreatedUser = {
     name: usersData.name,
     index: playerId,
     error: false,
     errorText: "No errors",
   };
+
+  if (
+    existingPlayer?.name === usersData.name &&
+    existingPlayer?.password === usersData.password
+  ) {
+    createdUser = {
+      name: existingPlayer.name,
+      index: existingPlayer.index,
+      error: false,
+      errorText: "No errors",
+    };
+  }
 
   sendPersonalResponse(ws, "reg", createdUser);
   updateRoom();
