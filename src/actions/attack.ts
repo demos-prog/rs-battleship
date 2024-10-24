@@ -13,16 +13,12 @@ export function attack(attackData: PlayerAttackDto) {
   }
 
   let data = attackData.data;
-  if (typeof data === "string") {
-    data = JSON.parse(data);
-  }
-
-  const currentAttackerIndex = data.indexPlayer;
-
+  
   if (typeof attackData.data === "string") {
     data = JSON.parse(attackData.data);
   }
 
+  const currentAttackerIndex = data.indexPlayer;
   const game: GameType = games.get(data.gameId);
 
   const victimPalyer: PlayerType | undefined = game.players.find(
@@ -30,6 +26,7 @@ export function attack(attackData: PlayerAttackDto) {
       return player.indexPlayer !== currentAttackerIndex;
     }
   );
+  
   if (victimPalyer) {
     let fieldData: FieldsDataType = fieldsData.get(data.gameId);
 

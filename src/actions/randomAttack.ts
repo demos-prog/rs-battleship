@@ -86,6 +86,7 @@ export function randomAttack(attackData: RandomAttackDto) {
         turns.set(data.gameId, currentAttackerIndex);
       }
 
+      
       // can be removed
       // victimField.forEach((row) => {
       //   console.log(row.join(" "));
