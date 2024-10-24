@@ -64,11 +64,13 @@ export function attack(attackData: PlayerAttackDto) {
         }
       }
 
-      // ДОРАБОТАТЬ
+      // preventing click spaming
       const prevAttackerIndex = turns.get(data.gameId);
 
       if (status === "shot" || status === "killed") {
-        turns.set(data.gameId, currentAttackerIndex);
+        if (prevAttackerIndex === currentAttackerIndex) {
+          return;
+        }
       } else {
         if (prevAttackerIndex === currentAttackerIndex) {
           return;

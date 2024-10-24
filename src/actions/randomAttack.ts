@@ -3,7 +3,7 @@ import { RandomAttackDto } from "../dto/RandomAttack.dto";
 import { FieldsDataType } from "../entities/FieldsData.type";
 import { GameType } from "../entities/Game.type";
 import { PlayerType } from "../entities/Player.type";
-import { fieldsData, games, players } from "../gameData";
+import { fieldsData, games, players, turns } from "../gameData";
 import { checkFinish } from "./checkFinish";
 import { turn } from "./turn";
 
@@ -18,11 +18,12 @@ export function randomAttack(attackData: RandomAttackDto) {
     data = JSON.parse(attackData.data);
   }
 
+  const currentAttackerIndex = data.indexPlayer;
   const game: GameType = games.get(data.gameId);
 
   const victimPalyer: PlayerType | undefined = game.players.find(
     (player: PlayerType) => {
-      return player.indexPlayer !== data.indexPlayer;
+      return player.indexPlayer !== currentAttackerIndex;
     }
   );
 
@@ -42,7 +43,7 @@ export function randomAttack(attackData: RandomAttackDto) {
       let newData = {
         x: Math.floor(Math.random() * 10),
         y: Math.floor(Math.random() * 10),
-        indexPlayer: data.indexPlayer,
+        indexPlayer: currentAttackerIndex,
         gameId: data.gameId,
       };
       let targetCell = "";
@@ -70,7 +71,21 @@ export function randomAttack(attackData: RandomAttackDto) {
           }
         }
       }
-      
+
+      // preventing click spaming
+      const prevAttackerIndex = turns.get(data.gameId);
+
+      if (status === "shot" || status === "killed") {
+        if (prevAttackerIndex === currentAttackerIndex) {
+          return;
+        }
+      } else {
+        if (prevAttackerIndex === currentAttackerIndex) {
+          return;
+        }
+        turns.set(data.gameId, currentAttackerIndex);
+      }
+
       // can be removed
       // victimField.forEach((row) => {
       //   console.log(row.join(" "));
