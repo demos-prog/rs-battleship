@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from "uuid";
 import { RoomType } from "../entities/Room.type";
 import WebSocket from "ws";
+import crypto from "crypto";
 import { updateRoom } from "./updateRoom";
 import { players, rooms } from "../gameData";
 import { PlayerDataType } from "../entities/PlayerData.type";
@@ -11,7 +11,7 @@ export function createRoom(ws: WebSocket) {
   );
 
   const newRoom: RoomType = {
-    roomId: uuidv4(),
+    roomId: crypto.randomUUID(),
     roomUsers: [
       {
         name: user.name,

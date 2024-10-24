@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
 import WebSocket from "ws";
+import crypto from "crypto";
 import { CreatedUser } from "../dto/CreatedUser.dto";
 import { NewUser } from "../dto/NewUser.dto";
 import { sendError } from "./sendError";
@@ -23,7 +23,7 @@ export function registration(ws: WebSocket, data: NewUser) {
     usersData = data;
   }
 
-  const playerId = uuidv4();
+  const playerId = crypto.randomUUID();
 
   const existingPlayer: PlayerDataType | undefined = players.get(playerId);
 

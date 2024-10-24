@@ -1,8 +1,7 @@
-> By default WebSocket client tries to connect to the 3000 port.
-
 ## Installation
 1. Clone/download repo
-2. `npm install`
+2. Add '.env' file with content 'HTTP_PORT=3000' to root folder 
+3. `npm install`
 
 ## Usage
 **Development**

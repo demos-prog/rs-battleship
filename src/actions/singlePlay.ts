@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
 import { RoomType } from "../entities/Room.type";
 import { players, rooms } from "../gameData";
 import { getUsersData } from "./getUsersData";
@@ -16,7 +16,7 @@ export function singlePlay(ws: WebSocket) {
     return;
   }
 
-  const botId = uuidv4();
+  const botId = crypto.randomUUID();
   const botWs = new WebSocket("ws://localhost:3000/");
 
   botWs.onopen = () => {
@@ -30,7 +30,7 @@ export function singlePlay(ws: WebSocket) {
     players.set(botId, botPlayer);
 
     const newRoom: RoomType = {
-      roomId: uuidv4(),
+      roomId: crypto.randomUUID(),
       roomUsers: [
         {
           name: botPlayer.name,
