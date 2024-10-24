@@ -9,10 +9,10 @@
 
 `npm run start:dev`
 
-* App served @ `http://localhost:3000` with tsx
+* App served @ `http://localhost:3000` 
 
 **Production**
 
 `npm run start`
 
-* App served @ `http://localhost:3000` without tsx
+* App served @ `http://localhost:3000`
