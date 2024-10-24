@@ -43,6 +43,7 @@ export const shutdown = () => {
       client.close();
     }
   });
+  process.exit();
 };
 
 process.on("SIGINT", shutdown);
